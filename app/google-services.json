@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "365665272015",
+    "firebase_url": "https://qiu-qiu-community.firebaseio.com",
+    "project_id": "qiu-qiu-community",
+    "storage_bucket": "qiu-qiu-community.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:365665272015:android:f842933ec13a6791b837ba",
+        "android_client_info": {
+          "package_name": "com.example.qiuqiucommunity"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "365665272015-69s0c9om6mfa65cte2suloauh9qtqpk8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAumXl42-ipg8JrcOWWu25T5jXb0OnSv7I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "365665272015-69s0c9om6mfa65cte2suloauh9qtqpk8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

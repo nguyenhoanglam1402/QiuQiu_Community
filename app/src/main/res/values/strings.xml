@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Qiu Qiu Community</string>
+    <string name="username">User name</string>
+    <string name="todo">TO DO</string>
+    <string name="avatar">AVATAR</string>
+    <string name="phonenumber">Số điện thoại : Unknown</string>
+    <string name="genderText">Giới tính : Unknown</string>
+    <string name="titlePanel">TitlePanel</string>
+</resources>
