@@ -58,22 +58,23 @@ public class RegistryActivity extends AppCompatActivity {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String email, password, rewritePassword, userName, phoneNumber;
+                String email, password, rewritePassword, userName, phoneNumber, address;
                 email= emailTextBox.getText().toString();
                 password= passwordTextBox.getText().toString();
                 rewritePassword= rewriteTextBox.getText().toString();
                 userName = usernameTextBox.getText().toString();
                 phoneNumber = phoneNumberTextBox.getText().toString();
+                address = addressTextBox.getText().toString();
                 progressDialog= new ProgressDialog(RegistryActivity.this);
                 progressDialog.setMessage("Xin chờ...");
                 progressDialog.show();
-                Registry(email,password,rewritePassword,userName,phoneNumber);
+                Registry(email,password,rewritePassword,userName,phoneNumber, address);
             }
         });
     }
-    private void Registry(String email, String password,
-                          String rewritePassword,
-                          final String userName, final String phoneNumber)
+    private void Registry(String email, String password, String rewritePassword,
+                          final String userName, final String phoneNumber,
+                          final String address)
     {
         if(password.equals(rewritePassword) && !userName.equals(null)) {
             firebaseAuth.createUserWithEmailAndPassword(email, password)
@@ -82,10 +83,13 @@ public class RegistryActivity extends AppCompatActivity {
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if(task.isSuccessful()){
                                 String userID = firebaseAuth.getUid();
+                                // Create HashMap Object
                                 HashMap<String, Object> userMap = new HashMap<String, Object>();
+                                //Put Value for each ID
                                 userMap.put("User ID",userID);
                                 userMap.put("Full name",userName);
                                 userMap.put("Phone number",phoneNumber);
+                                userMap.put("Address", address);
                                 databaseReference = FirebaseDatabase.getInstance().getReference().child("User Data").child(userID);
                                 databaseReference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override

@@ -33,7 +33,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -115,6 +115,14 @@
                 android:paddingEnd="10dp"
                 android:drawablePadding="10dp"
                 android:drawableLeft="@drawable/pin1"
+                android:background="@drawable/roundedtexteditor"
+                android:layout_marginBottom="10dp"/>
+
+            <Spinner
+                android:layout_width="350dp"
+                android:layout_height="40dp"
+                android:inputType="text"
+                android:layout_gravity="center"
                 android:background="@drawable/roundedtexteditor"
                 android:layout_marginBottom="10dp"/>
 

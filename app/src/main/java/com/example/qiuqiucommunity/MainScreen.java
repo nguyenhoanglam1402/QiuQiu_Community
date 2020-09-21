@@ -40,9 +40,11 @@ public class MainScreen extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     Map<String, Object> map = (Map<String, Object>) snapshot.getValue();
                     String fullName =(String)map.get("Full name");
-                    String phoneNumber =(String)map.get(("Phone number"));
+                    String phoneNumber =(String)map.get("Phone number");
+                    String address =(String)map.get("Address");
                     userNameTextView.setText(fullName);
                     phoneNumberTextView.setText("Số điện thoại: " + phoneNumber);
+                    addressTextView.setText("Địa chỉ: " + address);
                 }
 
                 @Override
