@@ -6,6 +6,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -17,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -24,26 +29,30 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 
 public class RegistryActivity extends AppCompatActivity {
 
     private final int LOCATION_REQUEST_CODE = 100;
-    EditText emailTextBox,passwordTextBox,rewriteTextBox, usernameTextBox, phoneNumberTextBox;
+    EditText emailTextBox,passwordTextBox,rewriteTextBox, usernameTextBox, phoneNumberTextBox, addressTextBox;
     Button signUpButton;
     FirebaseAuth firebaseAuth;
     ProgressDialog progressDialog;
     DatabaseReference databaseReference;
+    FusedLocationProviderClient fusedLocationProviderClient;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registry);
         firebaseAuth = FirebaseAuth.getInstance();
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(RegistryActivity.this);
         Mapping();
         EventTaking();
         checkPermission();
     }
-
     private void EventTaking()
     {
         signUpButton.setOnClickListener(new View.OnClickListener() {
@@ -131,6 +140,7 @@ public class RegistryActivity extends AppCompatActivity {
         passwordTextBox = findViewById(R.id.passwordTextBox);
         rewriteTextBox = findViewById(R.id.rewritePasswordTextBox);
         phoneNumberTextBox = findViewById(R.id. phoneNumberTxb);
+        addressTextBox = findViewById(R.id.addressTxb);
         signUpButton = findViewById(R.id.signUpButton);
     }
 
@@ -138,7 +148,7 @@ public class RegistryActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(RegistryActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED){
-            if(ActivityCompat.shouldShowRequestPermissionRationale(this,Manifest.permission.ACCESS_FINE_LOCATION)){
+            if(shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)){
                 AlertDialog. Builder builder = new AlertDialog.Builder(RegistryActivity.this);
                 builder.setTitle("Qiu Qiu Community cần");
                 builder.setMessage("Quyền truy cập vị trí chính xác để định vị vị trí hiện tại của bạn");
@@ -163,10 +173,31 @@ public class RegistryActivity extends AppCompatActivity {
         }
         else
         {
+            fusedLocationProviderClient.getLastLocation().addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    //Get your location from above event.
+                    Location location = task.getResult();
+                    if(location != null){
+                        // If location isn't null or have something about location information
+                        Geocoder geocoder = new Geocoder(RegistryActivity.this, Locale.getDefault());
+                        try {
+                            List<Address>addresses = geocoder.getFromLocation(location.getLatitude(),location.getLongitude(),1);
+                            showAndSetLocationInformation(addresses.get(0));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
             Toast.makeText(this,
-                    "Đã sẵn sàng cấp quyền !"
+                    "Đã sẵn sàng định vị !"
                     ,Toast.LENGTH_LONG).show();
         }
+    }
+
+    public void showAndSetLocationInformation(Address address) {
+        addressTextBox.setText(address.getAddressLine(0));
     }
 
     @Override
@@ -189,5 +220,4 @@ public class RegistryActivity extends AppCompatActivity {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
-    
 }
