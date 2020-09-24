@@ -12,7 +12,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.qiuqiucommunity.application.example.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -22,7 +21,6 @@ public class MainActivity extends AppCompatActivity {
     EditText userNameTxb, passwordTxb;
     TextView  signUpButton;
     Button loginButton;
-    User user = new User();
     FirebaseAuth firebaseAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +47,15 @@ public class MainActivity extends AppCompatActivity {
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
                                         dialog.dismiss();
-                                        Toast.makeText(MainActivity.this, "Đăng nhập thành công !", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this,
+                                                "Đăng nhập thành công !",
+                                                Toast.LENGTH_SHORT).show();
                                         startActivity(new Intent(MainActivity.this, MainScreen.class));
                                     } else {
                                         dialog.dismiss();
-                                        Toast.makeText(MainActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(MainActivity.this,
+                                                task.getException().getMessage(),
+                                                Toast.LENGTH_SHORT).show();
                                     }
                                 }
                             });

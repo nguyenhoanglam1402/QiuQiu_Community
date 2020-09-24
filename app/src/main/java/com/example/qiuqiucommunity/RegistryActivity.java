@@ -11,8 +11,10 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,6 +22,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.qiuqiucommunity.application.example.User;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -30,6 +33,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -37,107 +41,28 @@ import java.util.Locale;
 public class RegistryActivity extends AppCompatActivity {
 
     private final int LOCATION_REQUEST_CODE = 100;
-    EditText emailTextBox,passwordTextBox,rewriteTextBox, usernameTextBox, phoneNumberTextBox, addressTextBox;
+    EditText emailTextBox,passwordTextBox,rewriteTextBox;
+    EditText usernameTextBox, phoneNumberTextBox, addressTextBox;
+    Spinner genderSpinner;
     Button signUpButton;
     FirebaseAuth firebaseAuth;
     ProgressDialog progressDialog;
     DatabaseReference databaseReference;
     FusedLocationProviderClient fusedLocationProviderClient;
+    String fineAddress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registry);
         firebaseAuth = FirebaseAuth.getInstance();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(RegistryActivity.this);
-        Mapping();
-        EventTaking();
+        mapping();
+        eventTaking();
         checkPermission();
+        loadGender();
     }
-    private void EventTaking()
-    {
-        signUpButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String email, password, rewritePassword, userName, phoneNumber, address;
-                email= emailTextBox.getText().toString();
-                password= passwordTextBox.getText().toString();
-                rewritePassword= rewriteTextBox.getText().toString();
-                userName = usernameTextBox.getText().toString();
-                phoneNumber = phoneNumberTextBox.getText().toString();
-                address = addressTextBox.getText().toString();
-                progressDialog= new ProgressDialog(RegistryActivity.this);
-                progressDialog.setMessage("Xin chờ...");
-                progressDialog.show();
-                Registry(email,password,rewritePassword,userName,phoneNumber, address);
-            }
-        });
-    }
-    private void Registry(String email, String password, String rewritePassword,
-                          final String userName, final String phoneNumber,
-                          final String address)
-    {
-        if(password.equals(rewritePassword) && !userName.equals(null)) {
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                String userID = firebaseAuth.getUid();
-                                // Create HashMap Object
-                                HashMap<String, Object> userMap = new HashMap<String, Object>();
-                                //Put Value for each ID
-                                userMap.put("User ID",userID);
-                                userMap.put("Full name",userName);
-                                userMap.put("Phone number",phoneNumber);
-                                userMap.put("Address", address);
-                                databaseReference = FirebaseDatabase.getInstance().getReference().child("User Data").child(userID);
-                                databaseReference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if(task.isSuccessful()) {
-                                            Toast.makeText(RegistryActivity.this,
-                                                    "Sign up successfully !"
-                                                    , Toast.LENGTH_LONG).show();
-                                            progressDialog.dismiss();
-                                            Intent intent = new Intent(RegistryActivity.this, MainActivity.class);
-                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK| Intent.FLAG_ACTIVITY_NEW_TASK);
-                                            startActivity(intent);
-                                        }
-                                        else
-                                        {
-                                            progressDialog.dismiss();
-                                            Toast.makeText(RegistryActivity.this,
-                                                    task.getException().getMessage()
-                                                    , Toast.LENGTH_LONG).show();
-                                        }
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                progressDialog.dismiss();
-                                Toast.makeText(RegistryActivity.this,
-                                        task.getException().getMessage()
-                                        ,Toast.LENGTH_LONG).show();
-                            }
-
-                        }
-                    });
-        }
-        else {
-            if(userName.equals(null)) {
-                Toast.makeText(RegistryActivity.this,
-                        "Your name cannot be null",Toast.LENGTH_SHORT).show();
-            }
-            else {
-                Toast.makeText(RegistryActivity.this,
-                        "Your password and rewriting password are not match !",
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
-    private void Mapping()
+    private void mapping()
     {
         usernameTextBox = findViewById(R.id.fullNameTextBox);
         emailTextBox = findViewById(R.id.emailTextBox);
@@ -146,6 +71,114 @@ public class RegistryActivity extends AppCompatActivity {
         phoneNumberTextBox = findViewById(R.id. phoneNumberTxb);
         addressTextBox = findViewById(R.id.addressTxb);
         signUpButton = findViewById(R.id.signUpButton);
+        genderSpinner = findViewById(R.id.genderSpn);
+    }
+
+    private void eventTaking()
+    {
+        signUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String rewritePassword;
+                rewritePassword= rewriteTextBox.getText().toString();
+                progressDialog= new ProgressDialog(RegistryActivity.this);
+                progressDialog.setMessage("Xin chờ...");
+                progressDialog.show();
+                Registry(setRegistryInformation(), rewritePassword);
+            }
+        });
+    }
+
+    private User setRegistryInformation(){
+        final User user = new User();
+        user.setEmail(emailTextBox.getText().toString());
+        user.setPassword(passwordTextBox.getText().toString());
+        user.setFullName(usernameTextBox.getText().toString());
+        user.setPhoneNumber(phoneNumberTextBox.getText().toString());
+        user.setPresentationAddress(addressTextBox.getText().toString());
+        user.setAddress(fineAddress);
+        user.setGender(genderSpinner.getSelectedItem().toString());
+        return user;
+    }
+    private void loadGender(){
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_item,genders());
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genderSpinner.setAdapter(genderAdapter);
+    }
+
+    private ArrayList<String> genders(){
+        ArrayList<String> gendersList = new ArrayList<>();
+        gendersList.add("Nữ");
+        gendersList.add("Nam");
+        gendersList.add("Lesbian");
+        gendersList.add("Gay");
+        gendersList.add("Bisexual female");
+        gendersList.add("Bisexual male");
+        return gendersList;
+    }
+    private void Registry(final User user, String rewritePassword)
+    {
+            if (user.getPassword().equals(rewritePassword)
+                    && user.getEmail() != null) {
+                firebaseAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    user.setId(firebaseAuth.getUid());
+                                    // Create HashMap Object
+                                    HashMap<String, Object> userMap = new HashMap<>();
+                                    //Put Value for each ID
+                                    userMap.put("User ID", user.getId());
+                                    userMap.put("Full name", user.getFullName());
+                                    userMap.put("Phone number", user.getPhoneNumber());
+                                    userMap.put("Fine Address", user.getAddress());
+                                    userMap.put("Presentation Address", user.getPresentationAddress());
+                                    userMap.put("Gender", user.getGender());
+                                    databaseReference = FirebaseDatabase.getInstance().getReference().child("User Data").child(user.getId());
+                                    try {
+                                        databaseReference.setValue(userMap).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Toast.makeText(RegistryActivity.this,
+                                                            "Sign up successfully !"
+                                                            , Toast.LENGTH_LONG).show();
+                                                    progressDialog.dismiss();
+                                                    Intent intent = new Intent(RegistryActivity.this, MainActivity.class);
+                                                    startActivity(intent);
+                                                } else {
+                                                    progressDialog.dismiss();
+                                                    Toast.makeText(RegistryActivity.this,
+                                                            task.getException().getMessage()
+                                                            , Toast.LENGTH_LONG).show();
+                                                }
+                                            }
+                                        });
+                                    }
+                                    catch (Exception e){
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(RegistryActivity.this);
+                                        builder.setTitle("Error has been identified");
+                                        builder.setMessage(e.getMessage());
+                                        AlertDialog alertDialog = builder.create();
+                                        alertDialog.show();
+                                    }
+                                } else {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(RegistryActivity.this,
+                                            task.getException().getMessage()
+                                            , Toast.LENGTH_LONG).show();
+                                }
+
+                            }
+                        });
+            } else {
+                Toast.makeText(RegistryActivity.this,
+                        "Your password and rewriting password are not match !",
+                        Toast.LENGTH_SHORT).show();
+            }
+
     }
 
     private void checkPermission(){
@@ -201,7 +234,8 @@ public class RegistryActivity extends AppCompatActivity {
     }
 
     public void showAndSetLocationInformation(Address address) {
-        addressTextBox.setText(address.getAddressLine(0));
+        addressTextBox.setText(address.getAdminArea()+ ", " + address.getCountryName());
+        fineAddress= address.getAddressLine(0);
     }
 
     @Override

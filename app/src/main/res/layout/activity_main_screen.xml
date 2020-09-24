@@ -30,14 +30,15 @@
                         android:layout_height="200dp"
                         android:background="@drawable/wp2394188"
                         android:contentDescription="@string/todo" />
-                    <ImageView
-                        android:id="@+id/imageView"
+                    <com.mikhaellopez.circularimageview.CircularImageView
+                        android:id="@+id/largeAvatar"
                         android:layout_width="150dp"
                         android:layout_height="150dp"
                         android:layout_gravity="center"
                         android:layout_marginTop="-80dp"
                         android:contentDescription="@string/avatar"
-                        app:srcCompat="@drawable/circle_frame_14093539239wb2" />
+                        app:civ_border_color="#fff"
+                        android:src="@drawable/circle_frame_14093539239wb2" />
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -63,7 +64,7 @@
                         <ImageView
                             android:layout_width="30dp"
                             android:layout_height="30dp"
-                            android:background="@drawable/global"
+                            android:background="@drawable/placeholder"
                             android:contentDescription="globalIcon"/>
                         <TextView
                             android:textColor="#000"
@@ -130,11 +131,14 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
                         android:layout_marginBottom="10dp">
-                        <ImageView
+                        <com.mikhaellopez.circularimageview.CircularImageView
+                            android:id="@+id/smallAvatar"
                             android:layout_marginStart="10dp"
-                            android:background="@drawable/circle_frame_14093539239wb2"
+                            android:src="@drawable/circle_frame_14093539239wb2"
                             android:layout_width="50dp"
                             android:layout_height="50dp"
+                            app:civ_border_color="#000"
+                            app:civ_border_width="2dp"
                             android:contentDescription="@string/titlePanel"/>
                         <EditText
                             android:layout_marginLeft="10dp"
