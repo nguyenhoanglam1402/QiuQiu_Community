@@ -62,8 +62,7 @@ public class RegistryActivity extends AppCompatActivity {
         checkPermission();
         loadGender();
     }
-    private void mapping()
-    {
+    private void mapping() {
         usernameTextBox = findViewById(R.id.fullNameTextBox);
         emailTextBox = findViewById(R.id.emailTextBox);
         passwordTextBox = findViewById(R.id.passwordTextBox);
@@ -74,8 +73,7 @@ public class RegistryActivity extends AppCompatActivity {
         genderSpinner = findViewById(R.id.genderSpn);
     }
 
-    private void eventTaking()
-    {
+    private void eventTaking() {
         signUpButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +98,7 @@ public class RegistryActivity extends AppCompatActivity {
         user.setGender(genderSpinner.getSelectedItem().toString());
         return user;
     }
+
     private void loadGender(){
         ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item,genders());
@@ -117,8 +116,8 @@ public class RegistryActivity extends AppCompatActivity {
         gendersList.add("Bisexual male");
         return gendersList;
     }
-    private void Registry(final User user, String rewritePassword)
-    {
+
+    private void Registry(final User user, String rewritePassword) {
             if (user.getPassword().equals(rewritePassword)
                     && user.getEmail() != null) {
                 firebaseAuth.createUserWithEmailAndPassword(user.getEmail(), user.getPassword())
