@@ -38,6 +38,9 @@ public class MainScreen extends AppCompatActivity {
     ImageView profileBackgroundImgView;
     Button newsButton;
     ListView postList;
+    ImageView avatarImageOfPost;
+    TextView nameUser;
+    TextView description;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,14 +156,20 @@ public class MainScreen extends AppCompatActivity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            View view = getLayoutInflater().inflate(R.layout.postitem,null);
-            ImageView avatarImageOfPost = view.findViewById(R.id.avatarPostItemIMG);
-            TextView nameUser = view.findViewById(R.id.usernamePostTextViewTV);
-            TextView description = view.findViewById(R.id.descriptionPostTextViewTV);
-            //Receiving data
-            avatarImageOfPost.setImageResource(Images[position]);
-            nameUser.setText(Username[position]);
-            description.setText(Description[position]);
+            View view;
+            if(position == 0){
+                view= getLayoutInflater().inflate(R.layout.profile_item, null);
+            }
+            else {
+                view = getLayoutInflater().inflate(R.layout.postitem, null);
+                avatarImageOfPost = view.findViewById(R.id.avatarPostItemIMG);
+                nameUser = view.findViewById(R.id.usernamePostTextViewTV);
+                description = view.findViewById(R.id.descriptionPostTextViewTV);
+                //Receiving data
+                avatarImageOfPost.setImageResource(Images[position]);
+                nameUser.setText(Username[position]);
+                description.setText(Description[position]);
+            }
             return view;
         }
     }
